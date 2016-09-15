@@ -1,1 +1,6 @@
 venv
+*.pyc
+*.*~
+*.swp
+.directory
+*.kate-swp
