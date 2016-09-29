@@ -4,3 +4,6 @@ venv
 *.swp
 .directory
 *.kate-swp
+.project
+.pydevproject
+.settings
