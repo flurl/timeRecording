@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Employee, Shift, Break
+
+admin.site.register(Employee)
+admin.site.register(Shift)
+admin.site.register(Break)
