@@ -1,0 +1,30 @@
+{% extends "timeTracker/base.html" %}
+
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'timeTracker/css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+
+	<input type="text" id="emp_number">
+	
+	<div id="emp_box">
+		<div id="emp_error" class="hidden"></div>
+		
+		<div id="emp_info" class="hidden">
+			<div id="emp_info_image"></div>
+			<div id="emp_info_name"></div>
+			<div id="emp_info_working_time></div>
+		</div><!--/emp_info-->
+	
+	</div><!--/emp_box-->
+	
+	<div id="actions">
+	
+	</div><!--/actions-->
+	
+	<script src="{% static 'timeTracker/js/index.js' %}"></script>
+
+{% endblock %}
