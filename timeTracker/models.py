@@ -16,7 +16,7 @@ class Employee(models.Model):
 class Shift(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     start = models.DateTimeField()
-    end = models.DateTimeField(null=True)
+    end = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "%s: %s - %s" % (self.employee, self.start, self.end)
@@ -25,7 +25,7 @@ class Shift(models.Model):
 class Break(models.Model):
     shift = models.ForeignKey(Shift, on_delete=CASCADE)
     start = models.DateTimeField()
-    end = models.DateTimeField(null=True)
+    end = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return "%s - %s" % (self.start, self.end)
