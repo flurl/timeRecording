@@ -141,14 +141,30 @@ var time_tracker = (function() {
 		        }
 		    });
 		},
+		
+		on_enter_pressed: function() {
+			if (this.current_emp != null) {
+				if (this.current_shift !== null) {
+					this.punch_out();
+				} else {
+					this.punch_in();
+				}
+			}
+		},
 	};
 })();
 
 $(document).ready(function() {
 	var emp_number_input = $('#emp_number');
 	emp_number_input.val(''); 
+	emp_number_input.focus();
 	emp_number_input.on('input', function(e) {
 		var emp_number = $(this).val();
 		time_tracker.get_employee_info_by_number(emp_number);
+	});
+	emp_number_input.on('keypress', function(e) {
+		if (e.which == 13) {
+			time_tracker.on_enter_pressed();
+		}
 	});
 })
