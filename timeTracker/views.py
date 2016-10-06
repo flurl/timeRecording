@@ -1,8 +1,13 @@
+# standard library
+import time
+
+# Django
 from django.http import HttpResponse, Http404
 from django.core import serializers
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
+# local Django
 from .models import Employee, Shift
 
 
@@ -39,3 +44,7 @@ def punch_in(request, emp_id, when=None):
     shift = Shift(employee=emp, start=when)
     shift.save()
     return HttpResponse('OK')
+
+
+def get_server_time(request):
+    return HttpResponse(int(time.time()))

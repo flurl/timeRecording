@@ -2,8 +2,62 @@ var time_tracker = (function() {
 
 	var current_emp = null;
 	var current_shift = null;
+	var current_time = null;
+	var reload_timer = null;
 
 	return {
+	
+		setup: function() {
+			var emp_number_input = $('#emp_number');
+			emp_number_input.val(''); 
+			emp_number_input.focus();
+			emp_number_input.on('input', function(e) {
+				time_tracker.set_reload_timer();
+				var emp_number = $(this).val();
+				time_tracker.get_employee_info_by_number(emp_number);
+			});
+			emp_number_input.on('keypress', function(e) {
+				if (e.which == 13) {
+					time_tracker.set_reload_timer();
+					time_tracker.on_enter_pressed();
+				}
+			});
+			this.sync_time();
+			this.set_reload_timer();
+		},
+		
+		set_reload_timer: function() {
+			if (time_tracker.reload_timer) clearTimeout(time_tracker.reload_timer);
+			time_tracker.reload_timer = setTimeout(function() { location.reload(true); }, 60000);
+		},
+		
+		sync_time: function() {
+			var self = this;
+			$.ajax({
+		        url : '/timeTracker/server_time/', // the endpoint
+		        type : "GET", // http method
+		        cache: false,
+		        
+		        complete: function() { setTimeout(time_tracker.sync_time, 5000)},
+		        
+		        success : function(response) {
+		        	self.current_time = new Date(parseInt(response)*1000);
+		        	// TODO: is there a better way to determine the locale than the language?
+		        	$('#clock').text(self.current_time.toLocaleString(
+		        										window.navigator.userLanguage || window.navigator.language, 
+		        										{ year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }
+		        										)
+		        					);
+		        },
+		
+		        // handle a non-successful response
+		        error : function(xhr,errmsg,err) {
+		        	console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+		        	$('#clock').text('Couldn\'t sync time');
+		        }
+		    });
+		},
+	
 		get_employee_info_by_number: function(emp_number) {
 			var err_div = $('#emp_error');
 			var info_div = $('#emp_info');
@@ -155,16 +209,5 @@ var time_tracker = (function() {
 })();
 
 $(document).ready(function() {
-	var emp_number_input = $('#emp_number');
-	emp_number_input.val(''); 
-	emp_number_input.focus();
-	emp_number_input.on('input', function(e) {
-		var emp_number = $(this).val();
-		time_tracker.get_employee_info_by_number(emp_number);
-	});
-	emp_number_input.on('keypress', function(e) {
-		if (e.which == 13) {
-			time_tracker.on_enter_pressed();
-		}
-	});
+	time_tracker.setup();
 })

@@ -24,4 +24,6 @@ urlpatterns = [
         views.punch_in, name='punch_in_at'),
     url(r'^punch_in/(?P<emp_id>[0-9]+)/$',
         views.punch_in, name='punch_in'),
+    url(r'^server_time/$',
+        views.get_server_time, name='get_server_time'),
 ]
