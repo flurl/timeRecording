@@ -68,6 +68,10 @@ input, select {
 
 }
 
+#emp_error {
+	color: red;
+}
+
 .punch_in a, .punch_in a:active,
 .punch_in a:visited, .punch_in a:focus {
 	color: green;
