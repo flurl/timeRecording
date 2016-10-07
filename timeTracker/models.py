@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models.deletion import CASCADE
+from django.core.exceptions import ValidationError
+
 
 # Create your models here.
 
@@ -24,6 +26,11 @@ class Shift(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
     start = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
+
+    def clean(self):
+        models.Model.clean(self)
+        if self.end <= self.start:
+            raise ValidationError('END_LTE_START')
 
     def __str__(self):
         return "%s: %s - %s" % (self.employee, self.start, self.end)

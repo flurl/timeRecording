@@ -2,8 +2,13 @@ var time_tracker = (function() {
 
 	var current_emp = null;
 	var current_shift = null;
-	var current_time = null;
+	// the time from the server on which our calculations are based
+	// should be updated regularly for precision
+	var current_date = null;
 	var reload_timer = null;
+	
+	var userLocale = window.navigator.userLanguage || window.navigator.language;
+	var defaultDateFormat = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
 
 	return {
 	
@@ -41,9 +46,9 @@ var time_tracker = (function() {
 		        complete: function() { setTimeout(time_tracker.sync_time, 5000)},
 		        
 		        success : function(response) {
-		        	self.current_time = new Date(parseInt(response)*1000);
+		        	self.current_date = new Date(parseInt(response)*1000);
 		        	// TODO: is there a better way to determine the locale than the language?
-		        	$('#clock').text(self.current_time.toLocaleString(
+		        	$('#clock').text(self.current_date.toLocaleString(
 		        										window.navigator.userLanguage || window.navigator.language, 
 		        										{ year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }
 		        										)
@@ -84,7 +89,7 @@ var time_tracker = (function() {
 		        	err_div.removeClass('hidden');
 		        	info_div.addClass('hidden'); 
 		            err_div.text('Unknown employee');
-		            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+		            //console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
 		        }
 		    });
 		},
@@ -132,6 +137,25 @@ var time_tracker = (function() {
 				href: '#',
 				click: (function() {this.punch_in();}).bind(this)
 			}).appendTo(adiv);
+			
+			let next_quarter_hour = new Date(this.current_date.getTime());
+			var minutes = (parseInt((next_quarter_hour.getMinutes() / 15)) + 1) * 15;
+			if (minutes >= 60) {
+				minutes = 0;
+				next_quarter_hour.setHours(next_quarter_hour.getHours()+1);
+			}
+			next_quarter_hour.setMinutes(minutes);
+			next_quarter_hour.setSeconds(0);
+			
+			for (var i=0; i<3; i++) {
+				let datetime=new Date(next_quarter_hour.getTime());
+				datetime.setMinutes(datetime.getMinutes()+15*i);
+				var nowPlus = $('<a>', {
+					text: datetime.toLocaleString(userLocale, {hour: '2-digit', minute: '2-digit' }),
+					href: '#',
+					click: (function() {this.punch_in(datetime);}).bind(this)
+				}).appendTo(adiv);
+			}
 		},
 		
 		setup_punch_out_actions: function() {
@@ -149,7 +173,7 @@ var time_tracker = (function() {
 		punch_in: function(when) {
 			var when = (typeof when !== 'undefined') ?  when : null;
 			$.ajax({
-		        url : '/timeTracker/punch_in/' + this.current_emp + '/' + (when === null ? '' : when + '/'), // the endpoint
+		        url : '/timeTracker/punch_in/' + this.current_emp + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -174,7 +198,7 @@ var time_tracker = (function() {
 		punch_out: function(when) {
 			var when = (typeof when !== 'undefined') ?  when : null;
 			$.ajax({
-		        url : '/timeTracker/punch_out/'+ this.current_shift + '/' + (when === null ? '' : when + '/'), // the endpoint
+		        url : '/timeTracker/punch_out/'+ this.current_shift + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -191,6 +215,7 @@ var time_tracker = (function() {
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
+		        	console.log(xhr.status + ": " + xhr.responseText);
 		        	alert('An error occurred. Please contact your admin!');
 		        }
 		    });
