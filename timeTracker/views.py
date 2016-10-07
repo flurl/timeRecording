@@ -14,6 +14,12 @@ from django.core.exceptions import ValidationError
 from .models import Employee, Shift, FieldOfEmployment
 
 
+def truncate_to_minutes(dt):
+    # round to minutes
+    dt = dt.replace(second=0, microsecond=0)
+    return dt
+
+
 def index(request):
     return render(request, 'timeTracker/index.html')
 
@@ -37,6 +43,7 @@ def punch_out(request, shift_id, when=None):
     shift = get_object_or_404(Shift, pk=shift_id)
     if when is None:
         when = timezone.now()
+    when = truncate_to_minutes(when)
     shift.end = when
 
     try:
@@ -57,9 +64,7 @@ def punch_in(request, emp_id, foe_id, when=None):
     else:
         when = datetime.fromtimestamp(int(when), tz=timezone.utc)
 
-    # round to minutes
-    minutes = when.minute if when.second < 30 else when.minute + 1
-    when = when.replace(minute=minutes, second=0, microsecond=0)
+    when = truncate_to_minutes(when)
 
     shift = Shift(employee=emp, field_of_employment=foe, start=when)
     shift.save()
