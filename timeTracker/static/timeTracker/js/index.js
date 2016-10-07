@@ -153,6 +153,8 @@ var timeTracker = (function() {
 		},
 		
 		setupPunchInActions: function() {
+			$('#actions').removeClass('punch_out').addClass('punch_in');
+		
 			var adiv = $('#action_header');
 			adiv.empty();
 			adiv.append($('<h1>Punch in</h1>'));
@@ -189,6 +191,8 @@ var timeTracker = (function() {
 		},
 		
 		setupPunchOutActions: function() {
+			$('#actions').removeClass('punch_in').addClass('punch_out');
+		
 			var adiv = $('#action_header');
 			adiv.empty();
 			adiv.append($('<h1>Punch out</h1>'));

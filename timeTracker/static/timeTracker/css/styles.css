@@ -68,6 +68,24 @@ input, select {
 
 }
 
+.punch_in a, .punch_in a:active,
+.punch_in a:visited, .punch_in a:focus {
+	color: green;
+}
+
+#actions.punch_in h1 {
+	color: green;
+}
+
+.punch_out a, .punch_out a:active,
+.punch_out a:visited, .punch_out a:focus {
+	color: red;
+}
+
+#actions.punch_out h1 {
+	color: red;
+}
+
 #action_header h1 {
 	font-size: 200%;
 }
