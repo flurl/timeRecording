@@ -86,6 +86,8 @@ var timeTracker = (function() {
 		        	self.currentEmp = null;
 		        	errDiv.removeClass('hidden');
 		        	infoDiv.addClass('hidden'); 
+		        	$('#action_header').empty();
+		        	$('#action_buttons').empty();
 		            errDiv.text('Unknown employee');
 		            //console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
 		        }
