@@ -9,14 +9,16 @@ var timeTracker = (function() {
 	
 	// TODO: is there a better way to determine the locale than the language?
 	var userLocale = window.navigator.userLanguage || window.navigator.language;
-	var defaultDateFormat = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+	var defaultDatetimeFormat = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+	var defaultTimeFormat = { hour: '2-digit', minute: '2-digit' };
 
 	return {
-	
+		
 		setup: function() {
 			var empNumberInput = $('#emp_number');
 			empNumberInput.val(''); 
 			empNumberInput.focus();
+			
 			empNumberInput.on('input', function(e) {
 				timeTracker.setReloadTimer();
 				var empNumber = $(this).val();
@@ -48,7 +50,7 @@ var timeTracker = (function() {
 		        
 		        success : function(response) {
 		        	self.currentDate = new Date(parseInt(response)*1000);
-		        	$('#clock').text(self.currentDate.toLocaleString(timeTracker.userLocale, timeTracker.defaultDateFormat));
+		        	$('#clock').text(self.currentDate.toLocaleString(userLocale, defaultDatetimeFormat));
 		        },
 		
 		        // handle a non-successful response
@@ -104,7 +106,7 @@ var timeTracker = (function() {
 		        success : function(json) {
 		        	var shift = $.parseJSON(json)[0];
 		        	self.currentShift = shift.pk;
-		        	$('#emp_info_work_time').text(new Date(shift.fields.start).toLocaleString());
+		        	$('#emp_info_work_time').text(new Date(shift.fields.start).toLocaleString(userLocale, defaultDatetimeFormat));
 		        },
 		
 		        // handle a non-successful response
@@ -177,7 +179,7 @@ var timeTracker = (function() {
 				let datetime=new Date(nextQuarterHour.getTime());
 				datetime.setMinutes(datetime.getMinutes()+15*i);
 				var nowPlus = $('<a>', {
-					text: datetime.toLocaleString(userLocale, {hour: '2-digit', minute: '2-digit' }),
+					text: datetime.toLocaleString(userLocale, defaultTimeFormat),
 					href: '#',
 					click: (function() {this.punchIn(datetime);}).bind(this)
 				}).appendTo(adiv);
