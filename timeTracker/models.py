@@ -1,15 +1,21 @@
 from django.db import models
-from django.db.models.deletion import CASCADE
 from django.core.exceptions import ValidationError
 
 
 # Create your models here.
+
+class FieldOfEmployment(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 
 class Employee(models.Model):
     number = models.CharField(max_length=255)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    fields_of_employment = models.ManyToManyField(FieldOfEmployment)
 
     @property
     def current_shift(self):
@@ -23,9 +29,10 @@ class Employee(models.Model):
 
 
 class Shift(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.PROTECT)
     start = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
+    field_of_employment = models.ForeignKey(FieldOfEmployment)
 
     def clean(self):
         models.Model.clean(self)
@@ -33,11 +40,11 @@ class Shift(models.Model):
             raise ValidationError('END_LTE_START')
 
     def __str__(self):
-        return "%s: %s - %s" % (self.employee, self.start, self.end)
+        return "%s %s: %s - %s" % (self.field_of_employment, self.employee, self.start, self.end)
 
 
 class Break(models.Model):
-    shift = models.ForeignKey(Shift, on_delete=CASCADE)
+    shift = models.ForeignKey(Shift, on_delete=models.PROTECT)
     start = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
 

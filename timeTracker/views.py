@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 
 
 # local Django
-from .models import Employee, Shift
+from .models import Employee, Shift, FieldOfEmployment
 
 
 def index(request):
@@ -49,8 +49,9 @@ def punch_out(request, shift_id, when=None):
     return HttpResponse('OK')
 
 
-def punch_in(request, emp_id, when=None):
+def punch_in(request, emp_id, foe_id, when=None):
     emp = get_object_or_404(Employee, pk=emp_id)
+    foe = get_object_or_404(FieldOfEmployment, pk=foe_id)
     if when is None:
         when = timezone.now()
     else:
@@ -60,7 +61,7 @@ def punch_in(request, emp_id, when=None):
     minutes = when.minute if when.second < 30 else when.minute + 1
     when = when.replace(minute=minutes, second=0, microsecond=0)
 
-    shift = Shift(employee=emp, start=when)
+    shift = Shift(employee=emp, field_of_employment=foe, start=when)
     shift.save()
     # TODO: use JsonResponse object
     return HttpResponse('OK')
@@ -69,3 +70,15 @@ def punch_in(request, emp_id, when=None):
 def get_server_time(request):
     # TODO: use JsonResponse object
     return HttpResponse(int(time.time()))
+
+
+def get_fields_of_employment(request, emp_id=None):
+    if emp_id is None:
+        # TODO: use JsonResponse object
+        return HttpResponse(serializers.serialize('json', FieldOfEmployment.objects.all()))
+    else:
+        emp = get_object_or_404(Employee, pk=emp_id)
+        foes = emp.fields_of_employment.all()
+        if len(foes) == 0:
+            raise Http404("EMP_WITHOUT_FOE")
+        return HttpResponse(serializers.serialize('json', foes))

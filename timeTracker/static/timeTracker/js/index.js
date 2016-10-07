@@ -7,6 +7,7 @@ var timeTracker = (function() {
 	var currentDate = null;
 	var reloadTimer = null;
 	
+	// TODO: is there a better way to determine the locale than the language?
 	var userLocale = window.navigator.userLanguage || window.navigator.language;
 	var defaultDateFormat = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
 
@@ -47,12 +48,7 @@ var timeTracker = (function() {
 		        
 		        success : function(response) {
 		        	self.currentDate = new Date(parseInt(response)*1000);
-		        	// TODO: is there a better way to determine the locale than the language?
-		        	$('#clock').text(self.currentDate.toLocaleString(
-		        										window.navigator.userLanguage || window.navigator.language, 
-		        										{ year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }
-		        										)
-		        					);
+		        	$('#clock').text(self.currentDate.toLocaleString(timeTracker.userLocale, timeTracker.defaultDateFormat));
 		        },
 		
 		        // handle a non-successful response
@@ -108,13 +104,40 @@ var timeTracker = (function() {
 		        success : function(json) {
 		        	var shift = $.parseJSON(json)[0];
 		        	self.currentShift = shift.pk;
-		        	$('#emp_info_work_time').text(shift.fields.start);
+		        	$('#emp_info_work_time').text(new Date(shift.fields.start).toLocaleString());
 		        },
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
 		        	self.currentShift = null;
 		        	$('#emp_info_work_time').text('Not punched in');
+		        }
+		    });
+		},
+		
+		getEmployeeFOEs: function() {
+			var self = this;
+			$.ajax({
+		        url : '/timeTracker/fields_of_employment/' + self.currentEmp + '/', // the endpoint
+		        type : "GET", // http method
+		        cache: false,
+		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
+		
+		        // handle a successful response
+		        success : function(json) {
+		        	var FOEs = $.parseJSON(json);
+		        	var adiv = $('#action_buttons');
+		        	var select = $('<select>', {id: 'foe_select'})
+		        	FOEs.forEach(function(foe) {
+		        		select.append($('<option>', {value: foe.pk}).text(foe.fields.name));
+		        	})
+		        	adiv.prepend(select);
+		        },
+		
+		        // handle a non-successful response
+		        error : function(xhr,errmsg,err) {
+		        	alert('Error: No field of employment for employee found.')
+		        	location.reload(true);
 		        }
 		    });
 		},
@@ -128,9 +151,12 @@ var timeTracker = (function() {
 		},
 		
 		setupPunchInActions: function() {
-			var adiv = $('#actions');
+			var adiv = $('#action_header');
 			adiv.empty();
 			adiv.append($('<h1>Punch in</h1>'));
+			
+			adiv = $('#action_buttons');
+			adiv.empty();
 			
 			var now = $('<a>', {
 				text: 'Now',
@@ -156,6 +182,8 @@ var timeTracker = (function() {
 					click: (function() {this.punchIn(datetime);}).bind(this)
 				}).appendTo(adiv);
 			}
+			
+			this.getEmployeeFOEs();
 		},
 		
 		setupPunchOutActions: function() {
@@ -172,8 +200,9 @@ var timeTracker = (function() {
 		
 		punchIn: function(when) {
 			var when = (typeof when !== 'undefined') ?  when : null;
+			var foeId = $('#foe_select').val();
 			$.ajax({
-		        url : '/timeTracker/punch_in/' + this.currentEmp + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
+		        url : '/timeTracker/punch_in/' + this.currentEmp + '/' + foeId + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
