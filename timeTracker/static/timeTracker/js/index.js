@@ -189,9 +189,12 @@ var timeTracker = (function() {
 		},
 		
 		setupPunchOutActions: function() {
-			var adiv = $('#actions');
+			var adiv = $('#action_header');
 			adiv.empty();
 			adiv.append($('<h1>Punch out</h1>'));
+			
+			adiv = $('#action_buttons');
+			adiv.empty();
 			
 			var now = $('<a>', {
 				text: 'Now',
