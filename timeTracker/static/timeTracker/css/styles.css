@@ -97,3 +97,7 @@ input, select {
 .hidden {
 	display: none;
 }
+
+.small {
+	font-size: 50%;
+}

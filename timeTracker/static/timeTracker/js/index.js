@@ -208,6 +208,7 @@ var timeTracker = (function() {
 			$('<a>', {
 				text: 'Punch In forgotten',
 				href: '#',
+				class: 'small',
 				click: (function() {this.punchInForgotten();}).bind(this)
 			}).appendTo(adiv);
 		},
@@ -231,6 +232,7 @@ var timeTracker = (function() {
 			$('<a>', {
 				text: 'Punch Out forgotten',
 				href: '#',
+				class: 'small',
 				click: (function() {this.punchOutForgotten();}).bind(this)
 			}).appendTo(adiv);
 			
