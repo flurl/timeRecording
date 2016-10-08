@@ -11,6 +11,12 @@ var timeTracker = (function() {
 	var userLocale = window.navigator.userLanguage || window.navigator.language;
 	var defaultDatetimeFormat = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
 	var defaultTimeFormat = { hour: '2-digit', minute: '2-digit' };
+	
+	function pad(num, size) {
+	    var s = num+"";
+	    while (s.length < size) s = "0" + s;
+	    return s;
+	}
 
 	return {
 		
@@ -108,13 +114,21 @@ var timeTracker = (function() {
 		        success : function(json) {
 		        	var shift = $.parseJSON(json)[0];
 		        	self.currentShift = shift.pk;
-		        	$('#emp_info_work_time').text(new Date(shift.fields.start).toLocaleString(userLocale, defaultDatetimeFormat));
+		        	var shiftStart = new Date(shift.fields.start);
+		        	var now = new Date();
+		        	var timeDiffInSecs = Math.round((now.getTime() - shiftStart.getTime())/1000);
+		        	var durationHours = Math.floor(timeDiffInSecs/3600)
+		        	var durationMinutes = Math.floor(timeDiffInSecs/60)%60;
+		        	$('#shift_start').text(shiftStart.toLocaleString(userLocale, defaultDatetimeFormat));
+		        	$('#shift_duration').text(pad(durationHours, 2) + ':' + pad(durationMinutes , 2) + 'h')
+		        						.css('font-size', durationHours > 6 ? ((durationHours - 6)*100)+'%' : '100%');
 		        },
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
 		        	self.currentShift = null;
-		        	$('#emp_info_work_time').text('Not punched in');
+		        	$('#shift_start').text('Not punched in');
+		        	$('#shift_duration').empty().css('font-size', '100%');
 		        }
 		    });
 		},
