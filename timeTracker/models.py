@@ -33,6 +33,8 @@ class Shift(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
     field_of_employment = models.ForeignKey(FieldOfEmployment)
+    punch_in_forgotten = models.BooleanField(default=False)
+    punch_out_forgotten = models.BooleanField(default=False)
 
     def clean(self):
         models.Model.clean(self)

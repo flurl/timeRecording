@@ -30,4 +30,8 @@ urlpatterns = [
         views.get_fields_of_employment, name='fields_of_employment'),
     url(r'^fields_of_employment/(?P<emp_id>[0-9]+)/$',
         views.get_fields_of_employment, name='fields_of_employment_for_employee'),
+    url(r'^punch_in_forgotten/(?P<emp_id>[0-9]+)/$',
+        views.punch_in_forgotten, name='punch_in_forgotten'),
+    url(r'^punch_out_forgotten/(?P<shift_id>[0-9]+)/$',
+        views.punch_out_forgotten, name='punch_out_forgotten'),
 ]

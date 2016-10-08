@@ -204,6 +204,12 @@ var timeTracker = (function() {
 			}
 			
 			this.getEmployeeFOEs();
+			
+			$('<a>', {
+				text: 'Punch In forgotten',
+				href: '#',
+				click: (function() {this.punchInForgotten();}).bind(this)
+			}).appendTo(adiv);
 		},
 		
 		setupPunchOutActions: function() {
@@ -216,11 +222,18 @@ var timeTracker = (function() {
 			adiv = $('#action_buttons');
 			adiv.empty();
 			
-			var now = $('<a>', {
+			$('<a>', {
 				text: 'Now',
 				href: '#',
 				click: (function() {this.punchOut();}).bind(this)
 			}).appendTo(adiv);
+			
+			$('<a>', {
+				text: 'Punch Out forgotten',
+				href: '#',
+				click: (function() {this.punchOutForgotten();}).bind(this)
+			}).appendTo(adiv);
+			
 		},
 		
 		punchIn: function(when) {
@@ -282,6 +295,56 @@ var timeTracker = (function() {
 				} else {
 					this.punchIn();
 				}
+			}
+		},
+		
+		punchInForgotten: function() {
+			var msg = 'A new shift will be created and marked as invalid. Your negligence will be ' 
+						+ 'recorded and you\'ll have to explain yourself to your boss.\n'
+						+ 'The punishment devices are warmed up!';
+			if (confirm(msg)) {
+				$.ajax({
+			        url : '/timeTracker/punch_in_forgotten/'+ this.currentEmp + '/', // the endpoint
+			        type : "GET", // http method
+			        cache: false,
+			        success : function(response) {
+			        	if (response !== 'OK') {
+			        		alert('An error occurred. Please contact your admin!');
+			        	} else {
+			        		alert('Successfully punched in!');
+			        		location.reload(true);
+			        	}
+			        },
+			        error : function(xhr,errmsg,err) {
+			        	console.log(xhr.status + ": " + xhr.responseText);
+			        	alert('An error occurred. Please contact your admin!');
+			        }
+			    });
+			}
+		},
+		
+		punchOutForgotten: function() {
+			var msg = 'The open shift will be closed and marked as invalid. Your negligence will be ' 
+						+ 'recorded and you\'ll have to explain yourself to your boss.\n'
+						+ 'The punishment devices are warmed up!';
+			if (confirm(msg)) {
+				$.ajax({
+			        url : '/timeTracker/punch_out_forgotten/'+ this.currentShift + '/', // the endpoint
+			        type : "GET", // http method
+			        cache: false,
+			        success : function(response) {
+			        	if (response !== 'OK') {
+			        		alert('An error occurred. Please contact your admin!');
+			        	} else {
+			        		alert('Successfully punched out!');
+			        		location.reload(true);
+			        	}
+			        },
+			        error : function(xhr,errmsg,err) {
+			        	console.log(xhr.status + ": " + xhr.responseText);
+			        	alert('An error occurred. Please contact your admin!');
+			        }
+			    });
 			}
 		},
 	};

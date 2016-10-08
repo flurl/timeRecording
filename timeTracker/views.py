@@ -1,6 +1,6 @@
 # standard library
 import time
-from datetime import datetime
+import datetime
 
 # Django
 from django.http import HttpResponse, Http404, HttpResponseServerError
@@ -62,7 +62,7 @@ def punch_in(request, emp_id, foe_id, when=None):
     if when is None:
         when = timezone.now()
     else:
-        when = datetime.fromtimestamp(int(when), tz=timezone.utc)
+        when = datetime.datetime.fromtimestamp(int(when), tz=timezone.utc)
 
     when = truncate_to_minutes(when)
 
@@ -87,3 +87,24 @@ def get_fields_of_employment(request, emp_id=None):
         if len(foes) == 0:
             raise Http404("EMP_WITHOUT_FOE")
         return HttpResponse(serializers.serialize('json', foes))
+
+
+def punch_in_forgotten(request, emp_id):
+    emp = get_object_or_404(Employee, pk=emp_id)
+    foe = emp.fields_of_employment.all().first()
+    start = timezone.now() - datetime.timedelta(minutes=1)
+    start = truncate_to_minutes(start)
+    shift = Shift(employee=emp, field_of_employment=foe, start=start, punch_in_forgotten=True)
+    shift.save()
+    # TODO: use JsonResponse object
+    return HttpResponse('OK')
+
+
+def punch_out_forgotten(request, shift_id):
+    shift = get_object_or_404(Shift, pk=shift_id)
+    end = truncate_to_minutes(timezone.now())
+    shift.end = end
+    shift.punch_out_forgotten = True
+    shift.save()
+    # TODO: use JsonResponse object
+    return HttpResponse('OK')
