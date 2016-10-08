@@ -94,6 +94,10 @@ input, select {
 	font-size: 200%;
 }
 
+#actions a {
+	display: inline-block; /*this prevents line breaks within the a elements*/
+}
+
 .hidden {
 	display: none;
 }
