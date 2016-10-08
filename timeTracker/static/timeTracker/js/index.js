@@ -121,7 +121,7 @@ var timeTracker = (function() {
 		        	var durationMinutes = Math.floor(timeDiffInSecs/60)%60;
 		        	$('#shift_start').text(shiftStart.toLocaleString(userLocale, defaultDatetimeFormat));
 		        	$('#shift_duration').text(pad(durationHours, 2) + ':' + pad(durationMinutes , 2) + 'h')
-		        						.css('font-size', durationHours > 6 ? ((durationHours - 6)*100)+'%' : '100%');
+		        						.css('font-size', durationHours > 6 ? (Math.min(durationHours - 6, 6)*100)+'%' : '100%');
 		        },
 		
 		        // handle a non-successful response
