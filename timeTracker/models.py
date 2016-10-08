@@ -38,7 +38,7 @@ class Shift(models.Model):
 
     def clean(self):
         models.Model.clean(self)
-        if self.end <= self.start:
+        if self.end is not None and self.end <= self.start:
             raise ValidationError('END_LTE_START')
 
     def __str__(self):
