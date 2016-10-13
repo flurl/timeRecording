@@ -113,10 +113,14 @@ var timeTracker = (function() {
 		        // handle a successful response
 		        success : function(json) {
 		        	var shift = $.parseJSON(json)[0];
-		        	self.currentShift = shift.pk;
+		        	self.currentShift = shift;
+		        	//add a function to calculate the current shift duration
+		        	//returns the duration in seconds
+		        	self.currentShift.duration = function() {
+			        	return Math.round((new Date().getTime() - new Date(this.fields.start).getTime())/1000);
+		        	}
 		        	var shiftStart = new Date(shift.fields.start);
-		        	var now = new Date();
-		        	var timeDiffInSecs = Math.round((now.getTime() - shiftStart.getTime())/1000);
+		        	var timeDiffInSecs = self.currentShift.duration();
 		        	var durationHours = Math.floor(timeDiffInSecs/3600)
 		        	var durationMinutes = Math.floor(timeDiffInSecs/60)%60;
 		        	$('#shift_start').text(shiftStart.toLocaleString(userLocale, defaultDatetimeFormat));
@@ -223,16 +227,23 @@ var timeTracker = (function() {
 			adiv = $('#action_buttons');
 			adiv.empty();
 			
-			$('<a>', {
-				text: 'Now',
-				href: '#',
-				click: (function() {this.punchOut();}).bind(this)
-			}).appendTo(adiv);
+			var maxHours = 12*60*60;
+			var duration = this.currentShift.duration();
+			
+			// don't display the now button for shifts > 12h
+			// because in that case, it has to be markeds as 'forgotten'
+			if (duration <= maxHours) {
+				$('<a>', {
+					text: 'Now',
+					href: '#',
+					click: (function() {this.punchOut();}).bind(this)
+				}).appendTo(adiv);
+			}
 			
 			$('<a>', {
 				text: 'Punch Out forgotten',
 				href: '#',
-				class: 'small',
+				class: (duration <= maxHours) ? 'small' : '',
 				click: (function() {this.punchOutForgotten();}).bind(this)
 			}).appendTo(adiv);
 			
@@ -265,9 +276,15 @@ var timeTracker = (function() {
 		},
 		
 		punchOut: function(when) {
+			// if shifts > 12h mark as 'forgotten'
+			if (this.currentShift.duration() > 12*60*60) { 
+				this.punchOutForgotten();
+				return; 
+			}
+			
 			var when = (typeof when !== 'undefined') ?  when : null;
 			$.ajax({
-		        url : '/timeTracker/punch_out/'+ this.currentShift + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
+		        url : '/timeTracker/punch_out/'+ this.currentShift.pk + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -331,7 +348,7 @@ var timeTracker = (function() {
 						+ 'The punishment devices are warmed up!';
 			if (confirm(msg)) {
 				$.ajax({
-			        url : '/timeTracker/punch_out_forgotten/'+ this.currentShift + '/', // the endpoint
+			        url : '/timeTracker/punch_out_forgotten/'+ this.currentShift.pk + '/', // the endpoint
 			        type : "GET", // http method
 			        cache: false,
 			        success : function(response) {
