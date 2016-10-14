@@ -37,3 +37,13 @@ class ShiftTestCase(TestCase):
             self.shift.full_clean()
         except:
             self.fail('Shift validation with end set to None failed')
+
+    def test_validate_shift_when_longer_than_12_hours_but_punch_out_forgotten_is_set(self):
+        now = timezone.now()
+        self.shift.start = now - datetime.timedelta(hours=12, minutes=1)
+        self.shift.end = now
+        self.shift.punch_out_forgotten = True
+        try:
+            self.shift.full_clean()
+        except:
+            self.fail('Shift validation failed with duration greater 12hours and punch out forgotten flag set')

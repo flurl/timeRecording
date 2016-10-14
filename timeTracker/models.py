@@ -41,8 +41,10 @@ class Shift(models.Model):
         # the end has to be after the start
         if self.end is not None and self.end <= self.start:
             raise ValidationError({'end': 'END_LTE_START'})
-        # the shift must not be longer than 12 hours
-        if self.end is not None and (self.end - self.start).total_seconds() > 12 * 60 * 60:
+        # the shift must not be longer than 12 hours, except punch_out_forgotten is set
+        if self.end is not None and \
+           (self.end - self.start).total_seconds() > 12 * 60 * 60 and \
+           not self.punch_out_forgotten:
             raise ValidationError('DURATION_GT_12H')
 
     def __str__(self):
