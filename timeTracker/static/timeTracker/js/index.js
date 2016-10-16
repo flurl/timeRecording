@@ -17,6 +17,13 @@ var timeTracker = (function() {
 	    while (s.length < size) s = "0" + s;
 	    return s;
 	}
+	
+	function shiftWithinTimeLimits() {
+		// a valid shift has to have a positive duration not more than 12 hours
+		var duration = currentShift.duration();
+		var maxHours = 12*60*60;
+		return (duration < maxHours && duration > 0)
+	}
 
 	return {
 		
@@ -113,24 +120,28 @@ var timeTracker = (function() {
 		        // handle a successful response
 		        success : function(json) {
 		        	var shift = $.parseJSON(json)[0];
-		        	self.currentShift = shift;
+		        	currentShift = shift;
 		        	//add a function to calculate the current shift duration
 		        	//returns the duration in seconds
-		        	self.currentShift.duration = function() {
+		        	currentShift.duration = function() {
 			        	return Math.round((new Date().getTime() - new Date(this.fields.start).getTime())/1000);
 		        	}
 		        	var shiftStart = new Date(shift.fields.start);
-		        	var timeDiffInSecs = self.currentShift.duration();
+		        	var timeDiffInSecs = currentShift.duration();
 		        	var durationHours = Math.floor(timeDiffInSecs/3600)
 		        	var durationMinutes = Math.floor(timeDiffInSecs/60)%60;
 		        	$('#shift_start').text(shiftStart.toLocaleString(userLocale, defaultDatetimeFormat));
-		        	$('#shift_duration').text(pad(durationHours, 2) + ':' + pad(durationMinutes , 2) + 'h')
-		        						.css('font-size', durationHours > 6 ? (Math.min(durationHours - 6, 6)*100)+'%' : '100%');
+		        	if (timeDiffInSecs > 0) {
+			        	$('#shift_duration').text(pad(durationHours, 2) + ':' + pad(durationMinutes , 2) + 'h')
+			        						.css('font-size', durationHours > 6 ? (Math.min(durationHours - 6, 6)*100)+'%' : '100%');
+			        } else {
+			        	$('#shift_duration').text('Shift starts in the future').css('font-size', '100%');
+			        }
 		        },
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
-		        	self.currentShift = null;
+		        	currentShift = null;
 		        	$('#shift_start').text('Not punched in');
 		        	$('#shift_duration').empty().css('font-size', '100%');
 		        }
@@ -165,7 +176,7 @@ var timeTracker = (function() {
 		},
 		
 		setupActions: function() {
-			if (this.currentShift === null) {
+			if (currentShift === null) {
 				this.setupPunchInActions();
 			} else {
 				this.setupPunchOutActions();
@@ -227,12 +238,11 @@ var timeTracker = (function() {
 			adiv = $('#action_buttons');
 			adiv.empty();
 			
-			var maxHours = 12*60*60;
-			var duration = this.currentShift.duration();
+			var shiftIsValid = shiftWithinTimeLimits();
 			
-			// don't display the now button for shifts > 12h
-			// because in that case, it has to be markeds as 'forgotten'
-			if (duration <= maxHours) {
+			// don't display the now button for shifts > 12h or if it starts in the future
+			// because in that case, it has to be marked as 'forgotten'
+			if (shiftIsValid) {
 				$('<a>', {
 					text: 'Now',
 					href: '#',
@@ -243,7 +253,7 @@ var timeTracker = (function() {
 			$('<a>', {
 				text: 'Punch Out forgotten',
 				href: '#',
-				class: (duration <= maxHours) ? 'small' : '',
+				class: (shiftIsValid) ? 'small' : '',
 				click: (function() {this.punchOutForgotten();}).bind(this)
 			}).appendTo(adiv);
 			
@@ -276,15 +286,15 @@ var timeTracker = (function() {
 		},
 		
 		punchOut: function(when) {
-			// if shifts > 12h mark as 'forgotten'
-			if (this.currentShift.duration() > 12*60*60) { 
+			// if shifts > 12h or starts in the future mark as 'forgotten'
+			if (!shiftWithinTimeLimits()) { 
 				this.punchOutForgotten();
 				return; 
 			}
 			
 			var when = (typeof when !== 'undefined') ?  when : null;
 			$.ajax({
-		        url : '/timeTracker/punch_out/'+ this.currentShift.pk + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
+		        url : '/timeTracker/punch_out/'+ currentShift.pk + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -309,7 +319,7 @@ var timeTracker = (function() {
 		
 		onEnterPressed: function() {
 			if (this.currentEmp != null) {
-				if (this.currentShift !== null) {
+				if (currentShift !== null) {
 					this.punchOut();
 				} else {
 					this.punchIn();
@@ -348,7 +358,7 @@ var timeTracker = (function() {
 						+ 'The punishment devices are warmed up!';
 			if (confirm(msg)) {
 				$.ajax({
-			        url : '/timeTracker/punch_out_forgotten/'+ this.currentShift.pk + '/', // the endpoint
+			        url : '/timeTracker/punch_out_forgotten/'+ currentShift.pk + '/', // the endpoint
 			        type : "GET", // http method
 			        cache: false,
 			        success : function(response) {
