@@ -25,7 +25,7 @@ class ShiftTestCase(TestCase):
         self.shift = Shift(
             employee=self.emp, field_of_employment=self.foe, start=start, end=end)
 
-    def test_shift_not_longer_than_12_hours(self):
+    def test_shift_not_longer_than_max_working_time(self):
         now = timezone.now()
         self.shift.start = now - datetime.timedelta(hours=12, minutes=1)
         self.shift.end = now
