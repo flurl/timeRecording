@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'constance',
+    'constance.backends.database',
 ]
 
 MIDDLEWARE = [
@@ -123,3 +125,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+
+CONSTANCE_CONFIG = {
+    'MAX_WORKING_TIME': (12*60*60, 'Maximum total allowed working time '
+                                   'in seconds'),
+}
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'

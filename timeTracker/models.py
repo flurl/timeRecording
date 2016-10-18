@@ -1,8 +1,8 @@
+from constance import config
+
 from django.db import models
 from django.core.exceptions import ValidationError
 
-
-# Create your models here.
 
 class FieldOfEmployment(models.Model):
     name = models.CharField(max_length=200)
@@ -43,9 +43,9 @@ class Shift(models.Model):
             raise ValidationError({'end': 'END_LTE_START'})
         # the shift must not be longer than 12 hours, except punch_out_forgotten is set
         if self.end is not None and \
-           (self.end - self.start).total_seconds() > 12 * 60 * 60 and \
+           (self.end - self.start).total_seconds() > config.MAX_WORKING_TIME and \
            not self.punch_out_forgotten:
-            raise ValidationError('DURATION_GT_12H')
+            raise ValidationError('DURATION_GT_MAXWORKTIME')
 
     def __str__(self):
         return "%s %s: %s - %s" % (self.field_of_employment, self.employee, self.start, self.end)
