@@ -11,7 +11,7 @@ from . import views
 app_name = 'timeTracker'
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^employee_info_by_number/(?P<emp_number>[0-9]+)/$',
+    url(r'^employee_info_by_number/(?P<emp_number>[\w]+)/$',
         views.get_employee_info_by_number, name='employee_info'),
     url(r'^current_employee_shift/(?P<emp_id>[0-9]+)/$',
         views.get_current_employee_shift, name='current_employee_shift'),
