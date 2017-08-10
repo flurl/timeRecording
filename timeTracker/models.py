@@ -16,7 +16,7 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     fields_of_employment = models.ManyToManyField(FieldOfEmployment)
-    sv_nr = models.CharField(max_length=255)
+    sv_nr = models.CharField(max_length=255, default='', blank=True)
 
     @property
     def current_shift(self):
