@@ -30,6 +30,19 @@
 		<div id="action_buttons"></div>
 	</div><!--/actions-->
 	
+	<div id="punched_in_employees_list">
+	    {% if open_shifts_list %}
+	        <p>Currently punched in:</p>
+	        <table>
+	            {% for shift in open_shifts_list %}
+	                <tr><td>{{ shift.employee.number }}</td><td>{{ shift.employee.last_name }} {{ shift.employee.first_name }}</td><td>{{ shift.start|date:"c" }}</td></tr>
+	            {% endfor %}
+	        </table>
+	    {% else %}
+	        <p>No one is currently at work</p>
+	    {% endif %}
+	</div>
+	
 	<script src="{% static 'timeTracker/js/index.js' %}"></script>
 
 {% endblock %}

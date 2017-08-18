@@ -1,6 +1,7 @@
 # standard library
 import time
 import datetime
+import json
 
 # Django
 from django.http import HttpResponse, Http404, HttpResponseServerError
@@ -29,9 +30,10 @@ def round_time(time, round_to):
     return rounded
 
 
-
 def index(request):
-    return render(request, 'timeTracker/index.html')
+    open_shifts_list = Shift.objects.filter(end=None).select_related('employee')
+    context = {'open_shifts_list': open_shifts_list}
+    return render(request, 'timeTracker/index.html', context)
 
 
 def get_employee_info_by_number(request, emp_number):
@@ -120,3 +122,12 @@ def punch_out_forgotten(request, shift_id):
     shift.save()
     # TODO: use JsonResponse object
     return HttpResponse('OK')
+
+
+def get_open_shifts(request):
+    shiftsQuerySet = Shift.objects.filter(end=None).select_related('employee')
+    shifts = []
+    for s in shiftsQuerySet:
+        shifts.append({'number': s.employee.number, 'name': s.employee.last_name+' '+s.employee.first_name, 'shift_start': s.start.isoformat()})
+    return HttpResponse(json.dumps(shifts))
+

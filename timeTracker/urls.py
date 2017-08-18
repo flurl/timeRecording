@@ -34,4 +34,6 @@ urlpatterns = [
         views.punch_in_forgotten, name='punch_in_forgotten'),
     url(r'^punch_out_forgotten/(?P<shift_id>[0-9]+)/$',
         views.punch_out_forgotten, name='punch_out_forgotten'),
+    url(r'^open_shifts/$',
+        views.get_open_shifts, name='get_open_shifts'),
 ]
