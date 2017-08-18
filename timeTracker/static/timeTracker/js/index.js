@@ -11,6 +11,8 @@ var timeTracker = (function() {
 	var userLocale = window.navigator.userLanguage || window.navigator.language;
 	var defaultDatetimeFormat = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
 	var defaultTimeFormat = { hour: '2-digit', minute: '2-digit' };
+	var punchInOngoing = false;
+	var punchOutOngoing = false;
 	
 	function pad(num, size) {
 	    var s = num+"";
@@ -260,6 +262,8 @@ var timeTracker = (function() {
 		},
 		
 		punchIn: function(when) {
+		    if (punchInOngoing) return;
+		    punchInOngoing = true;
 			var when = (typeof when !== 'undefined') ?  when : null;
 			var foeId = $('#foe_select').val();
 			$.ajax({
@@ -270,6 +274,7 @@ var timeTracker = (function() {
 		
 		        // handle a successful response
 		        success : function(response) {
+		            punchInOngoing = false;
 		        	if (response !== 'OK') {
 		        		alert('An error occurred. Please contact your admin!');
 		        	} else {
@@ -280,12 +285,15 @@ var timeTracker = (function() {
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
+		            punchInOngoing = false;
 		        	alert('An error occurred. Please contact your admin!');
 		        }
 		    });
 		},
 		
 		punchOut: function(when) {
+		    if (punchOutOngoing) return false;
+		    punchOutOngoing = true;
 			// if shifts > 12h or starts in the future mark as 'forgotten'
 			if (!shiftWithinTimeLimits()) { 
 				this.punchOutForgotten();
@@ -301,6 +309,7 @@ var timeTracker = (function() {
 		
 		        // handle a successful response
 		        success : function(response) {
+		            punchOutOngoing = false;
 		        	if (response !== 'OK') {
 		        		alert('An error occurred. Please contact your admin!');
 		        	} else {
@@ -311,6 +320,7 @@ var timeTracker = (function() {
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
+		            punchOutOngoing = false;
 		        	console.log(xhr.status + ": " + xhr.responseText);
 		        	alert('An error occurred. Please contact your admin!');
 		        }
