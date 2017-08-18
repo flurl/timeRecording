@@ -13,6 +13,7 @@ var timeTracker = (function() {
 	var defaultTimeFormat = { hour: '2-digit', minute: '2-digit' };
 	var punchInOngoing = false;
 	var punchOutOngoing = false;
+	var unfinishedEmployeeInfoRequests = 0;
 	
 	function pad(num, size) {
 	    var s = num+"";
@@ -77,6 +78,7 @@ var timeTracker = (function() {
 		},
 	
 		getEmployeeInfoByNumber: function(empNumber) {
+		    unfinishedEmployeeInfoRequests++;
 			var errDiv = $('#emp_error');
 			var infoDiv = $('#emp_info');
 			var self = this;
@@ -98,6 +100,7 @@ var timeTracker = (function() {
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
+		            unfinishedEmployeeInfoRequests--;
 		        	self.currentEmp = null;
 		        	errDiv.removeClass('hidden');
 		        	infoDiv.addClass('hidden'); 
@@ -121,6 +124,7 @@ var timeTracker = (function() {
 		
 		        // handle a successful response
 		        success : function(json) {
+		            unfinishedEmployeeInfoRequests--;
 		        	var shift = $.parseJSON(json)[0];
 		        	currentShift = shift;
 		        	//add a function to calculate the current shift duration
@@ -143,6 +147,7 @@ var timeTracker = (function() {
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
+		            unfinishedEmployeeInfoRequests--;
 		        	currentShift = null;
 		        	$('#shift_start').text('Not punched in');
 		        	$('#shift_duration').empty().css('font-size', '100%');
@@ -262,7 +267,7 @@ var timeTracker = (function() {
 		},
 		
 		punchIn: function(when) {
-		    if (punchInOngoing) return;
+		    if (unfinishedEmployeeInfoRequests || punchInOngoing) return;
 		    punchInOngoing = true;
 			var when = (typeof when !== 'undefined') ?  when : null;
 			var foeId = $('#foe_select').val();
@@ -292,7 +297,7 @@ var timeTracker = (function() {
 		},
 		
 		punchOut: function(when) {
-		    if (punchOutOngoing) return false;
+		    if (unfinishedEmployeeInfoRequests || punchOutOngoing) return false;
 		    punchOutOngoing = true;
 			// if shifts > 12h or starts in the future mark as 'forgotten'
 			if (!shiftWithinTimeLimits()) { 
