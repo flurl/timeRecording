@@ -20,6 +20,16 @@ def truncate_to_minutes(dt):
     return dt
 
 
+def round_time(time, round_to):
+    """roundTo is the number of minutes to round to"""
+    rounded = time + datetime.timedelta(minutes=round_to/2.)
+    rounded -= datetime.timedelta(minutes=rounded.minute % round_to,
+                                  seconds=rounded.second,
+                                  microseconds=rounded.microsecond)
+    return rounded
+
+
+
 def index(request):
     return render(request, 'timeTracker/index.html')
 
@@ -44,6 +54,7 @@ def punch_out(request, shift_id, when=None):
     if when is None:
         when = timezone.now()
     when = truncate_to_minutes(when)
+    when = round_time(when, 15)
     shift.end = when
 
     try:
@@ -65,6 +76,7 @@ def punch_in(request, emp_id, foe_id, when=None):
         when = datetime.datetime.fromtimestamp(int(when), tz=timezone.utc)
 
     when = truncate_to_minutes(when)
+    when = round_time(when, 15)
 
     shift = Shift(employee=emp, field_of_employment=foe, start=when)
     shift.save()
