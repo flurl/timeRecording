@@ -8,6 +8,12 @@
 
 {% block content %}
 
+    {% if config.MOTD != "" %}
+        <div id="motd">
+            {{ config.MOTD|linebreaksbr }}
+        </div>
+    {% endif %}
+
 	<div id="clock"></div>
 
 	<input type="number" id="emp_number">

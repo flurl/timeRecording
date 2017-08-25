@@ -131,5 +131,6 @@ STATICFILES_DIRS = [
 CONSTANCE_CONFIG = {
     'MAX_WORKING_TIME': (12*60*60, 'Maximum total allowed working time '
                                    'in seconds'),
+    'MOTD': ('', 'Message of the day'),
 }
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'

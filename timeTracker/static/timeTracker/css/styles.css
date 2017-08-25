@@ -61,6 +61,13 @@ input, select {
 	font-size: 100%;
 }
 
+#motd {
+    border: 2px solid red;
+    background-color: yellow;
+    padding: 1em;
+    font-weight: bold;
+}
+
 #clock {
 }
 

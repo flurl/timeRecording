@@ -9,6 +9,9 @@ from django.core import serializers
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from constance import config
+
+
 
 
 # local Django
@@ -32,7 +35,7 @@ def round_time(time, round_to):
 
 def index(request):
     open_shifts_list = Shift.objects.filter(end=None).select_related('employee')
-    context = {'open_shifts_list': open_shifts_list}
+    context = {'open_shifts_list': open_shifts_list, 'config': config}
     return render(request, 'timeTracker/index.html', context)
 
 
