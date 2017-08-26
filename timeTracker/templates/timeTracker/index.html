@@ -8,12 +8,6 @@
 
 {% block content %}
 
-    {% if config.MOTD != "" %}
-        <div id="motd">
-            {{ config.MOTD|linebreaksbr }}
-        </div>
-    {% endif %}
-
 	<div id="clock"></div>
 
 	<input type="number" id="emp_number">
@@ -35,6 +29,13 @@
 		<div id="action_header"></div>
 		<div id="action_buttons"></div>
 	</div><!--/actions-->
+
+    {% if config.MOTD != "" %}
+        <div id="motd">
+            {{ config.MOTD|linebreaksbr }}
+        </div>
+    {% endif %}
+
 	
 	<div id="punched_in_employees_list">
 	    {% if open_shifts_list %}
