@@ -91,7 +91,7 @@ var timeTracker = (function() {
 		        // handle a successful response
 		        success : function(json) {
 		        	var emp = $.parseJSON(json)[0];
-		        	self.currentEmp = emp.pk;
+		        	self.currentEmp = {'id':emp.pk, 'number': emp.fields.number};
 		        	errDiv.addClass('hidden');
 		        	infoDiv.removeClass('hidden');
 		        	$('#emp_info_name').text(emp.fields.number + ' - ' + emp.fields.first_name + ' ' + emp.fields.last_name);
@@ -158,7 +158,7 @@ var timeTracker = (function() {
 		getEmployeeFOEs: function() {
 			var self = this;
 			$.ajax({
-		        url : '/timeTracker/fields_of_employment/' + self.currentEmp + '/', // the endpoint
+		        url : '/timeTracker/fields_of_employment/' + self.currentEmp.id + '/', // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -281,11 +281,15 @@ var timeTracker = (function() {
 		
 		punchIn: function(when) {
 		    if (unfinishedEmployeeInfoRequests || punchInOngoing) return;
+		    if ($('#emp_number').val() != this.currentEmp.number) {
+		        $('#emp_number').trigger('input');
+		        return;
+		    }
 		    punchInOngoing = true;
 			var when = (typeof when !== 'undefined') ?  when : null;
 			var foeId = $('#foe_select').val();
 			$.ajax({
-		        url : '/timeTracker/punch_in/' + this.currentEmp + '/' + foeId + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
+		        url : '/timeTracker/punch_in/' + this.currentEmp.id + '/' + foeId + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -311,6 +315,10 @@ var timeTracker = (function() {
 		
 		punchOut: function(when) {
 		    if (unfinishedEmployeeInfoRequests || punchOutOngoing) return false;
+		    if ($('#emp_number').val() != this.currentEmp.number) {
+		        $('#emp_number').trigger('input');
+		        return;
+		    }
 		    punchOutOngoing = true;
 			// if shifts > 12h or starts in the future mark as 'forgotten'
 			if (!shiftWithinTimeLimits()) { 
@@ -361,7 +369,7 @@ var timeTracker = (function() {
 						+ 'The punishment devices are warmed up!';
 			if (confirm(msg)) {
 				$.ajax({
-			        url : '/timeTracker/punch_in_forgotten/'+ this.currentEmp + '/', // the endpoint
+			        url : '/timeTracker/punch_in_forgotten/'+ this.currentEmp.id + '/', // the endpoint
 			        type : "GET", // http method
 			        cache: false,
 			        success : function(response) {
