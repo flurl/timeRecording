@@ -195,7 +195,13 @@ var timeTracker = (function() {
 		
 			var adiv = $('#action_header');
 			adiv.empty();
-			adiv.append($('<h1>Punch in</h1>'));
+			var h = $('<h1></h1>');
+			$('<a>', {
+				text: 'Punch In',
+				href: '#',
+				click: (function() {this.punchIn();}).bind(this)
+			}).appendTo(h);
+			adiv.append($(h));
 			
 			adiv = $('#action_buttons');
 			adiv.empty();
@@ -236,16 +242,23 @@ var timeTracker = (function() {
 		},
 		
 		setupPunchOutActions: function() {
+		    var shiftIsValid = shiftWithinTimeLimits();
 			$('#actions').removeClass('punch_in').addClass('punch_out');
 		
 			var adiv = $('#action_header');
 			adiv.empty();
-			adiv.append($('<h1>Punch out</h1>'));
+			if (shiftIsValid) {
+			    var h = $('<h1></h1>');
+			    $('<a>', {
+					    text: 'Punch Out',
+					    href: '#',
+					    click: (function() {this.punchOut();}).bind(this)
+				    }).appendTo(h);
+			    adiv.append(h);
+			}
 			
 			adiv = $('#action_buttons');
 			adiv.empty();
-			
-			var shiftIsValid = shiftWithinTimeLimits();
 			
 			// don't display the now button for shifts > 12h or if it starts in the future
 			// because in that case, it has to be marked as 'forgotten'
