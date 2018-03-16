@@ -33,7 +33,7 @@ class Shift(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.PROTECT)
     start = models.DateTimeField()
     end = models.DateTimeField(null=True, blank=True)
-    field_of_employment = models.ForeignKey(FieldOfEmployment)
+    field_of_employment = models.ForeignKey(FieldOfEmployment, on_delete=models.CASCADE)
     punch_in_forgotten = models.BooleanField(default=False)
     punch_out_forgotten = models.BooleanField(default=False)
 
