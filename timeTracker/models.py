@@ -5,18 +5,18 @@ from django.core.exceptions import ValidationError
 
 
 class FieldOfEmployment(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return self.name
 
 
 class Employee(models.Model):
-    number = models.CharField(max_length=255)
+    number = models.CharField(max_length=255, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     fields_of_employment = models.ManyToManyField(FieldOfEmployment)
-    sv_nr = models.CharField(max_length=255, default='', blank=True)
+    sv_nr = models.CharField(max_length=255, default='', blank=True, unique=True, null=True)
 
     @property
     def current_shift(self):
