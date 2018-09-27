@@ -176,7 +176,7 @@ var timeTracker = (function() {
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
-		        	alert('Error: No field of employment for employee found.')
+		        	timeTracker.errorMessage('Error: No field of employment for employee found.')
 		        	location.reload(true);
 		        }
 		    });
@@ -308,7 +308,7 @@ var timeTracker = (function() {
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
 		            punchInOngoing = false;
-		        	alert('An error occurred. Please contact your admin!');
+		        	timeTracker.errorMessage('An error occurred. Please contact your admin!');
 		        }
 		    });
 		},
@@ -348,7 +348,7 @@ var timeTracker = (function() {
 		        error : function(xhr,errmsg,err) {
 		            punchOutOngoing = false;
 		        	console.log(xhr.status + ": " + xhr.responseText);
-		        	alert('An error occurred. Please contact your admin!');
+		        	timeTracker.errorMessage('An error occurred. Please contact your admin!');
 		        }
 		    });
 		},
@@ -382,7 +382,7 @@ var timeTracker = (function() {
 			        },
 			        error : function(xhr,errmsg,err) {
 			        	console.log(xhr.status + ": " + xhr.responseText);
-			        	alert('An error occurred. Please contact your admin!');
+			        	timeTracker.errorMessage('An error occured! Please try again. If the error persists contact your admin.');
 			        }
 			    });
 			}
@@ -407,11 +407,17 @@ var timeTracker = (function() {
 			        },
 			        error : function(xhr,errmsg,err) {
 			        	console.log(xhr.status + ": " + xhr.responseText);
-			        	alert('An error occurred. Please contact your admin!');
+			        	timeTracker.errorMessage('An error occurred. Please contact your admin!');
 			        }
 			    });
 			}
 		},
+		
+		errorMessage: function(msg) {
+		    document.body.classList.add('error');
+		    alert(msg);
+		    document.body.classList.remove('error');
+		}
 	};
 })();
 
