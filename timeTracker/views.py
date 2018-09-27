@@ -72,8 +72,10 @@ def punch_out(request, shift_id, when=None):
     return HttpResponse('OK')
 
 
-def punch_in(request, emp_id, foe_id, when=None):
+def punch_in(request, emp_id, foe_id, when=None, punch_in_forgotten=False):
     emp = get_object_or_404(Employee, pk=emp_id)
+    if emp.current_shift is not None:
+        return HttpResponse("Open shift exists", status=409) # status CONFLICT
     foe = get_object_or_404(FieldOfEmployment, pk=foe_id)
     if when is None:
         when = timezone.now()
@@ -81,9 +83,10 @@ def punch_in(request, emp_id, foe_id, when=None):
         when = datetime.datetime.fromtimestamp(int(when), tz=timezone.utc)
 
     when = truncate_to_minutes(when)
-    when = round_time(when, 15)
+    if not punch_in_forgotten:
+        when = round_time(when, 15)
 
-    shift = Shift(employee=emp, field_of_employment=foe, start=when)
+    shift = Shift(employee=emp, field_of_employment=foe, start=when, punch_in_forgotten=punch_in_forgotten)
     shift.save()
     # TODO: use JsonResponse object
     return HttpResponse('OK')
@@ -108,13 +111,9 @@ def get_fields_of_employment(request, emp_id=None):
 
 def punch_in_forgotten(request, emp_id):
     emp = get_object_or_404(Employee, pk=emp_id)
-    foe = emp.fields_of_employment.all().first()
+    foe_id = emp.fields_of_employment.all().first().id
     start = timezone.now() - datetime.timedelta(minutes=1)
-    start = truncate_to_minutes(start)
-    shift = Shift(employee=emp, field_of_employment=foe, start=start, punch_in_forgotten=True)
-    shift.save()
-    # TODO: use JsonResponse object
-    return HttpResponse('OK')
+    return punch_in(request, emp_id, foe_id, time.mktime(start.timetuple()), True)
 
 
 def punch_out_forgotten(request, shift_id):
