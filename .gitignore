@@ -8,3 +8,4 @@ venv
 .pydevproject
 .settings
 db.sqlite3
+.vscode
