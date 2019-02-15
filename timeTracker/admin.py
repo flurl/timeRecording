@@ -53,6 +53,8 @@ class ShiftAdmin(admin.ModelAdmin):
         'employee', 'start', 'end', 'punch_in_forgotten', 'punch_out_forgotten', 'get_period')
     list_filter = (StartDateRangeListFilter, 'employee', 'start', 'punch_in_forgotten', 'punch_out_forgotten', 'field_of_employment')
     search_fields = ['employee__first_name', 'employee__last_name']
+    fields = (
+        'employee', 'start', 'end', 'punch_in_forgotten', 'punch_out_forgotten', 'get_period')
 
     def get_period(self, obj):
         try:

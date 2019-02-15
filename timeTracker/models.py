@@ -36,6 +36,7 @@ class Shift(models.Model):
     field_of_employment = models.ForeignKey(FieldOfEmployment, on_delete=models.CASCADE)
     punch_in_forgotten = models.BooleanField(default=False)
     punch_out_forgotten = models.BooleanField(default=False)
+    event = models.IntegerField(null=True, blank=True)
 
     def clean(self):
         models.Model.clean(self)
