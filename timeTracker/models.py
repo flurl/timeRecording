@@ -4,6 +4,18 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 
+class Event(models.Model):
+    lm_id = models.IntegerField(unique=True)
+    date = models.DateField()
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return "%s - %s" % (self.date, self.name)
+
+
 class FieldOfEmployment(models.Model):
     name = models.CharField(max_length=200, unique=True)
 
@@ -36,7 +48,7 @@ class Shift(models.Model):
     field_of_employment = models.ForeignKey(FieldOfEmployment, on_delete=models.CASCADE)
     punch_in_forgotten = models.BooleanField(default=False)
     punch_out_forgotten = models.BooleanField(default=False)
-    event = models.IntegerField(null=True, blank=True)
+    event = models.ForeignKey(Event, to_field="lm_id", on_delete=models.PROTECT, null=True)
 
     def clean(self):
         models.Model.clean(self)

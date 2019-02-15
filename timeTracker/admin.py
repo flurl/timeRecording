@@ -4,7 +4,7 @@ import calendar
 
 from django.contrib import admin
 
-from .models import Employee, Shift, Break, FieldOfEmployment
+from .models import Employee, Shift, Break, FieldOfEmployment, Event
 
 class StartDateRangeListFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
@@ -43,7 +43,7 @@ class StartDateRangeListFilter(admin.SimpleListFilter):
             year, month = [int(d) for d in datestr.split('-')]
             start = date(year, month, 1)
             end = date(year + (month+1)//12, (month+1)%12, 1)
-        return queryset.filter(start__gte=start,
+            return queryset.filter(start__gte=start,
                                start__lt=end)
 
 
@@ -51,7 +51,7 @@ class ShiftAdmin(admin.ModelAdmin):
     readonly_fields = ('get_period',)
     list_display = (
         'employee', 'start', 'end', 'punch_in_forgotten', 'punch_out_forgotten', 'get_period')
-    list_filter = (StartDateRangeListFilter, 'employee', 'start', 'punch_in_forgotten', 'punch_out_forgotten', 'field_of_employment')
+    list_filter = (StartDateRangeListFilter, 'employee', 'event', 'start', 'punch_in_forgotten', 'punch_out_forgotten', 'field_of_employment')
     search_fields = ['employee__first_name', 'employee__last_name']
     fields = (
         'employee', 'start', 'end', 'punch_in_forgotten', 'punch_out_forgotten', 'get_period')
@@ -68,3 +68,4 @@ admin.site.register(Shift, ShiftAdmin)
 admin.site.register(Employee)
 admin.site.register(Break)
 admin.site.register(FieldOfEmployment)
+admin.site.register(Event)
