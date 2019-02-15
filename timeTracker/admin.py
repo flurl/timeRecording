@@ -59,7 +59,7 @@ class ShiftAdmin(admin.ModelAdmin):
     def get_period(self, obj):
         try:
             return obj.end - obj.start
-        except TypeError as e:
+        except TypeError as e: # pylint: disable=unused-variable
             return "open"
 
 

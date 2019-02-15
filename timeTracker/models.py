@@ -21,7 +21,7 @@ class Employee(models.Model):
     @property
     def current_shift(self):
         try:
-            return self.shift_set.filter(end=None).order_by('-start')[0]
+            return self.shift_set.filter(end=None).order_by('-start')[0] # pylint: disable=no-member
         except IndexError:
             return None
 
