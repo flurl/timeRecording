@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'constance',
     'constance.backends.database',
+    'django_admin_listfilter_dropdown',
 ]
 
 MIDDLEWARE = [

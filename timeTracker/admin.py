@@ -3,6 +3,8 @@ import time
 import calendar
 
 from django.contrib import admin
+from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
+
 
 from .models import Employee, Shift, Break, FieldOfEmployment, Event
 
@@ -51,7 +53,7 @@ class ShiftAdmin(admin.ModelAdmin):
     readonly_fields = ('get_period',)
     list_display = (
         'employee', 'start', 'end', 'punch_in_forgotten', 'punch_out_forgotten', 'get_period')
-    list_filter = (StartDateRangeListFilter, 'employee', 'event', 'start', 'punch_in_forgotten', 'punch_out_forgotten', 'field_of_employment')
+    list_filter = (StartDateRangeListFilter, ('employee', RelatedDropdownFilter), ('event', RelatedDropdownFilter), 'start', 'punch_in_forgotten', 'punch_out_forgotten', 'field_of_employment')
     search_fields = ['employee__first_name', 'employee__last_name']
     fields = (
         'employee', 'start', 'end', 'punch_in_forgotten', 'punch_out_forgotten', 'get_period')
