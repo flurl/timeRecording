@@ -30,6 +30,9 @@ class Employee(models.Model):
     fields_of_employment = models.ManyToManyField(FieldOfEmployment)
     sv_nr = models.CharField(max_length=255, default='', blank=True, unique=True, null=True)
 
+    class Meta:
+        ordering = ("last_name", "first_name")
+
     @property
     def current_shift(self):
         try:
