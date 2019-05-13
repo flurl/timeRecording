@@ -38,13 +38,16 @@ class StartDateRangeListFilter(admin.SimpleListFilter):
         provided in the query string and retrievable via
         `self.value()`.
         """
-        # Compare the requested value (either '80s' or '90s')
-        # to decide how to filter the queryset.
         datestr = self.value()
         if datestr:
             year, month = [int(d) for d in datestr.split('-')]
             start = date(year, month, 1)
-            end = date(year + (month+1)//12, (month+1)%12, 1)
+            month += 1
+            if month >= 13:
+                year += 1
+                month = 1
+            end = date(year, month, 1)
+            print(start, end)
             return queryset.filter(start__gte=start,
                                start__lt=end)
 
