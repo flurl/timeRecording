@@ -47,7 +47,6 @@ class StartDateRangeListFilter(admin.SimpleListFilter):
                 year += 1
                 month = 1
             end = date(year, month, 1)
-            print(start, end)
             return queryset.filter(start__gte=start,
                                start__lt=end)
 
