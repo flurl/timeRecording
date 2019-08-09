@@ -134,4 +134,8 @@ CONSTANCE_CONFIG = {
                                    'in seconds'),
     'MOTD': ('', 'Message of the day'),
 }
+CONSTANCE_CONFIG_FIELDSETS = {
+    'General': ('MAX_WORKING_TIME', 'MOTD'),
+}
+
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
