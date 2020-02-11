@@ -2,7 +2,7 @@ astroid==2.1.0
 blessings==1.6
 bpython==0.16
 curtsies==0.2.10
-Django==2.0.3
+Django==2.2.10
 django-admin-list-filter-dropdown==1.0.2
 django-constance==2.1.0
 django-extensions==2.0.6
