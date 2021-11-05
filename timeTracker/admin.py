@@ -6,7 +6,7 @@ from django.contrib import admin
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
 
 
-from .models import Employee, Shift, Break, FieldOfEmployment, Event
+from .models import Employee, Message, MessageConfirmation, Shift, Break, FieldOfEmployment, Event
 
 class StartDateRangeListFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
@@ -73,3 +73,5 @@ admin.site.register(Employee)
 admin.site.register(Break)
 admin.site.register(FieldOfEmployment)
 admin.site.register(Event)
+admin.site.register(Message)
+admin.site.register(MessageConfirmation)

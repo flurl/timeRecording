@@ -28,7 +28,7 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     fields_of_employment = models.ManyToManyField(FieldOfEmployment)
-    sv_nr = models.CharField(max_length=255, default='', blank=True, unique=True, null=True)
+    sv_nr = models.CharField(max_length=255, blank=True, unique=True, null=True)
 
     class Meta:
         ordering = ("last_name", "first_name")
@@ -75,3 +75,30 @@ class Break(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.start, self.end)
+
+
+class Message(models.Model):
+    """
+    A model for showing messages to the employees on login
+    
+    confirmation required: the employee has to check the 
+        checkbox to confirm the message and continue with punch in
+    reoccuring: should the message be displayes solely once
+        per employee or on every punch in
+    employee: if null, the message is shown to everyone, else
+        it's only shown to the selected employees
+    """
+    text = models.TextField()
+    confirmation_required = models.BooleanField(default=False)
+    reoccuring = models.BooleanField(default=False)
+    employees = models.ManyToManyField(Employee, blank=True)
+    active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.text[0:50]
+
+
+class MessageConfirmation(models.Model):
+    employee = models.ForeignKey(Employee, on_delete = models.PROTECT)
+    shift = models.ForeignKey(Shift, on_delete = models.PROTECT)
+    confirmed = models.BooleanField()

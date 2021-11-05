@@ -181,6 +181,38 @@ var timeTracker = (function() {
 		        }
 		    });
 		},
+
+		getMessages: function() {
+			var self = this;
+			$.ajax({
+		        url : '/timeTracker/messages/' + self.currentEmp.id + '/', // the endpoint
+		        type : "GET", // http method
+		        cache: false,
+		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
+		
+		        // handle a successful response
+		        success : function(json) {
+		        	var messages = $.parseJSON(json);
+		        	var mdiv = $('#messages');
+		        	
+		        	messages.forEach(function(m) {
+						var p = $('<p>');
+						p.html(m.text);
+						mdiv.prepend(p);
+						var confirmDiv = $('<div>');
+						var confirmP = $('<p>').html('Gelesen und zur Kenntnis genommen').appendTo(confirmDiv);
+						var chkbox = $('<input>', {type: 'checkbox'}).appendTo(confirmDiv);
+						mdiv.append(confirmDiv);
+		        	})
+		        },
+		
+		        // handle a non-successful response
+		        error : function(xhr,errmsg,err) {
+		        	timeTracker.errorMessage('Error: No field of employment for employee found.')
+		        	location.reload(true);
+		        }
+		    });
+		},
 		
 		setupActions: function() {
 			if (currentShift === null) {
@@ -231,6 +263,7 @@ var timeTracker = (function() {
 				}).appendTo(adiv);
 			}
 			
+			this.getMessages()
 			this.getEmployeeFOEs();
 			
 			$('<a>', {

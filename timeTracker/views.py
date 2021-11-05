@@ -15,7 +15,7 @@ from constance import config
 
 
 # local Django
-from .models import Employee, Shift, FieldOfEmployment
+from .models import Employee, Shift, FieldOfEmployment, Message
 
 
 def truncate_to_minutes(dt):
@@ -132,4 +132,11 @@ def get_open_shifts(request):
     for s in shiftsQuerySet:
         shifts.append({'number': s.employee.number, 'name': s.employee.last_name+' '+s.employee.first_name, 'shift_start': s.start.isoformat()})
     return HttpResponse(json.dumps(shifts))
+
+def get_messages(request, emp_id):
+    messages_query_set = Message.objects.filter(employees=None).filter(active=True) | Message.objects.filter(employees__id=emp_id).filter(active=True)
+    messages = []
+    for m in messages_query_set:
+        messages.append({'text': m.text, 'confirmation_required': m.confirmation_required})
+    return HttpResponse(json.dumps(messages))
 
