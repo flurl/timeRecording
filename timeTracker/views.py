@@ -144,6 +144,10 @@ def get_messages(request, emp_id):
     messages_query_set = Message.objects.filter(employees=None).filter(active=True) | Message.objects.filter(employees__id=emp_id).filter(active=True)
     messages = []
     for m in messages_query_set:
+        # check if the employee has already confirmed the non-reoccuring message
+        if m.reoccuring == False:
+            if MessageConfirmation.objects.filter(shift__employee__id=emp_id,message=m.id).exists():
+                continue
         messages.append({'id': m.id, 'text': m.text, 'confirmation_required': m.confirmation_required})
     return HttpResponse(json.dumps(messages))
 
