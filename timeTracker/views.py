@@ -15,7 +15,7 @@ from constance import config
 
 
 # local Django
-from .models import Employee, Shift, FieldOfEmployment, Message
+from .models import Employee, Shift, FieldOfEmployment, Message, MessageConfirmation
 
 
 def truncate_to_minutes(dt):
@@ -88,6 +88,13 @@ def punch_in(request, emp_id, foe_id, when=None, punch_in_forgotten=False):
 
     shift = Shift(employee=emp, field_of_employment=foe, start=when, punch_in_forgotten=punch_in_forgotten)
     shift.save()
+
+    # save the messages, the employee has confirmed on login
+    if request.method == 'POST':
+        for ack in json.loads(request.body)['messages_acknowledged']:
+            msg = get_object_or_404(Message, pk=int(ack['id']))
+            mc = MessageConfirmation(shift=shift, message=msg, confirmed=ack['acknowledged'])
+            mc.save()
     # TODO: use JsonResponse object
     return HttpResponse('OK')
 
@@ -137,6 +144,6 @@ def get_messages(request, emp_id):
     messages_query_set = Message.objects.filter(employees=None).filter(active=True) | Message.objects.filter(employees__id=emp_id).filter(active=True)
     messages = []
     for m in messages_query_set:
-        messages.append({'text': m.text, 'confirmation_required': m.confirmation_required})
+        messages.append({'id': m.id, 'text': m.text, 'confirmation_required': m.confirmation_required})
     return HttpResponse(json.dumps(messages))
 

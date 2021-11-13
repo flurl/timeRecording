@@ -2,6 +2,9 @@ var timeTracker = (function() {
 
 	var currentEmp = null;
 	var currentShift = null;
+	// holds true for all ackned messages, false if not ackned
+	var messagesAck = [];
+
 	// the time from the server on which our calculations are based
 	// should be updated regularly for precision
 	var currentDate = null;
@@ -27,6 +30,27 @@ var timeTracker = (function() {
 		var maxHours = 12*60*60;
 		return (duration < maxHours && duration > 0)
 	}
+
+	function allMessagesAck() {
+		for (let i=0; i<messagesAck.length; i++) {
+			if (messagesAck[i].acknowledged == false) { return false; }
+		}
+		return true;
+	}
+
+	function readCookie(name) {
+		var nameEQ = encodeURIComponent(name) + "=";
+		var ca = document.cookie.split(';');
+		for (var i = 0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) === ' ')
+				c = c.substring(1, c.length);
+			if (c.indexOf(nameEQ) === 0)
+				return decodeURIComponent(c.substring(nameEQ.length, c.length));
+		}
+		return null;
+	}
+	
 
 	return {
 		
@@ -107,6 +131,7 @@ var timeTracker = (function() {
 		        	$('#action_header').empty();
 		        	$('#action_buttons').empty();
 		            errDiv.text('Unknown employee');
+					$('#messages').addClass('hidden');
 		            //console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
 		        }
 		    });
@@ -194,21 +219,30 @@ var timeTracker = (function() {
 		        success : function(json) {
 		        	var messages = $.parseJSON(json);
 		        	var mdiv = $('#messages');
-		        	
-		        	messages.forEach(function(m) {
-						var p = $('<p>');
-						p.html(m.text);
-						mdiv.prepend(p);
-						var confirmDiv = $('<div>');
-						var confirmP = $('<p>').html('Gelesen und zur Kenntnis genommen').appendTo(confirmDiv);
-						var chkbox = $('<input>', {type: 'checkbox'}).appendTo(confirmDiv);
-						mdiv.append(confirmDiv);
-		        	})
+					mdiv.removeClass('hidden');
+					mdiv.html('');
+					let tab = $('<table>').appendTo(mdiv);
+		        	messages.forEach(function(m, idx) {
+						let row = $('<tr>').appendTo(tab);
+						$('<td>').text(m.text).appendTo(row);
+						let td = $('<td>').appendTo(row);
+						if (m.confirmation_required) {
+							td.html('Gelesen und zur Kenntnis genommen<br>')
+							var chkbox = $('<input>', {type: 'checkbox'}).appendTo(td);
+							let msg = {'id': m.id, 'acknowledged': false };
+							messagesAck.push(msg);
+							chkbox.change(function() {
+								msg.acknowledged = this.checked;
+							});
+						} else {
+							messagesAck.push({'id': m.id, 'acknowledged': true });
+						}
+		        	});
 		        },
 		
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
-		        	timeTracker.errorMessage('Error: No field of employment for employee found.')
+		        	timeTracker.errorMessage('Error while getting messages.')
 		        	location.reload(true);
 		        }
 		    });
@@ -318,14 +352,21 @@ var timeTracker = (function() {
 		        $('#emp_number').trigger('input');
 		        return;
 		    }
+			if (!allMessagesAck()) {
+				timeTracker.errorMessage('Bitte Nachricht bestätigen!');
+				this.setReloadTimer();
+				return;
+			}
 		    punchInOngoing = true;
 			var when = (typeof when !== 'undefined') ?  when : null;
 			var foeId = $('#foe_select').val();
 			$.ajax({
 		        url : '/timeTracker/punch_in/' + this.currentEmp.id + '/' + foeId + '/' + (when === null ? '' : when.getTime()/1000 + '/'), // the endpoint
-		        type : "GET", // http method
+		        type : "POST", // http method
+				headers: { "X-CSRFToken": readCookie("csrftoken") },
 		        cache: false,
-		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
+				/*dataType: 'application/json',*/
+		        data : JSON.stringify({ 'messages_acknowledged' : messagesAck }), // data sent with the post request
 		
 		        // handle a successful response
 		        success : function(response) {
@@ -341,6 +382,8 @@ var timeTracker = (function() {
 		        // handle a non-successful response
 		        error : function(xhr,errmsg,err) {
 		            punchInOngoing = false;
+					console.log(xhr.status + ": " + xhr.responseText);
+					console.log(errmsg + ' - ' + err);
 		        	timeTracker.errorMessage('An error occurred. Please contact your admin!');
 		        }
 		    });

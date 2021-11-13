@@ -99,6 +99,6 @@ class Message(models.Model):
 
 
 class MessageConfirmation(models.Model):
-    employee = models.ForeignKey(Employee, on_delete = models.PROTECT)
     shift = models.ForeignKey(Shift, on_delete = models.PROTECT)
+    message = models.ForeignKey(Message, on_delete=models.PROTECT)
     confirmed = models.BooleanField()

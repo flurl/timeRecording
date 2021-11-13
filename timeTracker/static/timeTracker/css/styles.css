@@ -118,6 +118,27 @@ input, select {
     padding: .5em;
 }
 
+#messages {
+}
+
+#messages tr  {
+	background-color: #88ff88;
+}
+
+#messages tr:nth-child(even) {
+	background-color: #91b891;
+}
+
+#messages td {
+	border: 1px solid black;
+	padding: 0.5em;
+}
+
+#messages input[type="checkbox"] {
+	width: 60px;
+	height: 60px;
+}
+
 .hidden {
 	display: none;
 }
