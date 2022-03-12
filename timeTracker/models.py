@@ -88,6 +88,7 @@ class Message(models.Model):
     employee: if null, the message is shown to everyone, else
         it's only shown to the selected employees
     """
+    title = models.CharField(max_length=255)
     text = models.TextField()
     confirmation_required = models.BooleanField(default=False)
     reoccuring = models.BooleanField(default=False)
@@ -96,10 +97,13 @@ class Message(models.Model):
     active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.text[0:50]
+        return self.title
 
 
 class MessageConfirmation(models.Model):
     shift = models.ForeignKey(Shift, on_delete = models.PROTECT)
     message = models.ForeignKey(Message, on_delete=models.PROTECT)
     confirmed = models.BooleanField()
+
+    def __str__(self):
+        return str(self.shift.employee) + ' - ' + str(self.message)
