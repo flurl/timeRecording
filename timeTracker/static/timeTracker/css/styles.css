@@ -118,7 +118,8 @@ input, select {
     padding: .5em;
 }
 
-#messages {
+#messages table {
+	margin: 0 auto;
 }
 
 #messages tr  {

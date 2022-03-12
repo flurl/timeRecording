@@ -36,6 +36,8 @@ urlpatterns = [
         views.punch_out_forgotten, name='punch_out_forgotten'),
     url(r'^open_shifts/$',
         views.get_open_shifts, name='get_open_shifts'),
+    url(r'^messages/(?P<emp_id>[0-9]+)/(?P<foe_id>[0-9]+)/$',
+        views.get_messages, name='messages_for_employee_with_foe'),
     url(r'^messages/(?P<emp_id>[0-9]+)/$',
         views.get_messages, name='messages_for_employee'),
 ]

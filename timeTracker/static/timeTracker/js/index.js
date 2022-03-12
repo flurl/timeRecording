@@ -197,6 +197,8 @@ var timeTracker = (function() {
 		        		select.append($('<option>', {value: foe.pk}).text(foe.fields.name));
 		        	})
 		        	adiv.prepend(select);
+					
+					self.getMessages();
 		        },
 		
 		        // handle a non-successful response
@@ -209,8 +211,9 @@ var timeTracker = (function() {
 
 		getMessages: function() {
 			var self = this;
+			var foeId = $('#foe_select').val();
 			$.ajax({
-		        url : '/timeTracker/messages/' + self.currentEmp.id + '/', // the endpoint
+		        url : '/timeTracker/messages/' + self.currentEmp.id + '/' + foeId + '/', // the endpoint
 		        type : "GET", // http method
 		        cache: false,
 		        //data : { the_post : $('#post-text').val() }, // data sent with the post request
@@ -297,7 +300,6 @@ var timeTracker = (function() {
 				}).appendTo(adiv);
 			}
 			
-			this.getMessages()
 			this.getEmployeeFOEs();
 			
 			$('<a>', {

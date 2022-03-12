@@ -140,8 +140,13 @@ def get_open_shifts(request):
         shifts.append({'number': s.employee.number, 'name': s.employee.last_name+' '+s.employee.first_name, 'shift_start': s.start.isoformat()})
     return HttpResponse(json.dumps(shifts))
 
-def get_messages(request, emp_id):
-    messages_query_set = Message.objects.filter(employees=None).filter(active=True) | Message.objects.filter(employees__id=emp_id).filter(active=True)
+def get_messages(request, emp_id, foe_id=None):
+    # all messages with no employee AND no field of employment specified ORed together with
+    # all messages for a specific employee
+    messages_query_set = Message.objects.filter(employees=None).filter(foes=None) | Message.objects.filter(employees__id=emp_id)
+    if foe_id is not None:
+        messages_query_set = messages_query_set | Message.objects.filter(foes__id=foe_id)
+    messages_query_set = messages_query_set.filter(active=True)
     messages = []
     for m in messages_query_set:
         # check if the employee has already confirmed the non-reoccuring message

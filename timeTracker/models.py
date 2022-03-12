@@ -92,6 +92,7 @@ class Message(models.Model):
     confirmation_required = models.BooleanField(default=False)
     reoccuring = models.BooleanField(default=False)
     employees = models.ManyToManyField(Employee, blank=True)
+    foes = models.ManyToManyField(FieldOfEmployment, blank=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):
