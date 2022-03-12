@@ -91,7 +91,11 @@ def punch_in(request, emp_id, foe_id, when=None, punch_in_forgotten=False):
 
     # save the messages, the employee has confirmed on login
     if request.method == 'POST':
-        for ack in json.loads(request.body)['messages_acknowledged']:
+        try:
+            data = json.loads(request.body)
+        except TypeError:
+            data = json.loads(request.body.decode('utf-8'))
+        for ack in data['messages_acknowledged']:
             msg = get_object_or_404(Message, pk=int(ack['id']))
             mc = MessageConfirmation(shift=shift, message=msg, confirmed=ack['acknowledged'])
             mc.save()
