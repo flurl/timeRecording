@@ -66,6 +66,9 @@ class ShiftAdmin(admin.ModelAdmin):
         except TypeError as e: # pylint: disable=unused-variable
             return "open"
 
+class MessageConfirmationAdmin(admin.ModelAdmin):
+    list_filter = (('shift__employee', RelatedDropdownFilter), ('message', RelatedDropdownFilter))
+
 
 admin.site.register(Shift, ShiftAdmin)
 
@@ -74,4 +77,4 @@ admin.site.register(Break)
 admin.site.register(FieldOfEmployment)
 admin.site.register(Event)
 admin.site.register(Message)
-admin.site.register(MessageConfirmation)
+admin.site.register(MessageConfirmation, MessageConfirmationAdmin)
