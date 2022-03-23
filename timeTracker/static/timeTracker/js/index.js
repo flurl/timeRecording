@@ -225,6 +225,7 @@ var timeTracker = (function() {
 					mdiv.removeClass('hidden');
 					mdiv.html('');
 					let tab = $('<table>').appendTo(mdiv);
+					messagesAck = [];
 		        	messages.forEach(function(m, idx) {
 						let row = $('<tr>').appendTo(tab);
 						$('<td>').text(m.text).appendTo(row);
