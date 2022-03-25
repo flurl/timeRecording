@@ -61,6 +61,10 @@ input, select {
 	font-size: 100%;
 }
 
+a {
+    color: #88078c;
+}
+
 #motd {
     border: 2px solid red;
     background-color: yellow;
@@ -117,6 +121,29 @@ input, select {
     border: 1px solid black;
     padding: .5em;
 }
+
+
+#employee_list table {
+    margin: auto;
+}
+
+#employee_list table tr:nth-child(even) {
+    background-color: #f2f2f2
+}
+
+#employee_list table td {
+    border: 1px solid black;
+    padding: .5em;
+}
+
+#employee_list a {
+    font-weight: bold;
+}
+
+#employee_list a[name] {
+    font-size: 150%;
+}
+
 
 #messages table {
 	margin: 0 auto;

@@ -52,6 +52,20 @@
 	    {% endif %}
 	</div>
 	
+	<div id="employee_list">
+	    <hr>
+	    <h2>Employee List</h2>
+	    <div id="character_links">
+	        <a href="#employees_with_A">A</a> <a href="#employees_with_B">B</a> <a href="#employees_with_C">C</a> <a href="#employees_with_D">D</a> <a href="#employees_with_E">E</a> <a href="#employees_with_F">F</a> <a href="#employees_with_G">G</a> <a href="#employees_with_H">H</a> <a href="#employees_with_I">I</a> <a href="#employees_with_J">J</a> <a href="#employees_with_K">K</a> <a href="#employees_with_L">L</a> <a href="#employees_with_M">M</a> <a href="#employees_with_N">N</a> <a href="#employees_with_O">O</a> <a href="#employees_with_P">P</a> <a href="#employees_with_Q">Q</a> <a href="#employees_with_R">R</a> <a href="#employees_with_S">S</a> <a href="#employees_with_T">T</a> <a href="#employees_with_U">U</a> <a href="#employees_with_V">V</a> <a href="#employees_with_W">W</a> <a href="#employees_with_X">X</a> <a href="#employees_with_Y">Y</a> <a href="#employees_with_Z">Z</a> 
+	    </div>
+	    <table>
+	        {% for employee in employee_list %}
+	            {% ifchanged %}<tr><td colspan=2><h3><a name="employees_with_{{ employee.last_name.0|upper }}">{{ employee.last_name.0 }}</a></h3></td></tr>{% endifchanged %}
+	            <tr><td>{{ employee.number }}</td><td>{{ employee.last_name }} {{ employee.first_name }}</td></tr>
+	        {% endfor %}
+	    </table>
+	</div>
+	
 	<script src="{% static 'timeTracker/js/index.js' %}"></script>
 
 {% endblock %}

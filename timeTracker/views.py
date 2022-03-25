@@ -35,12 +35,13 @@ def round_time(time, round_to):
 
 def index(request):
     open_shifts_list = Shift.objects.filter(end=None).select_related('employee')
-    context = {'open_shifts_list': open_shifts_list, 'config': config}
+    employee_list = Employee.objects.filter(active=True)
+    context = {'employee_list': employee_list, 'open_shifts_list': open_shifts_list, 'config': config}
     return render(request, 'timeTracker/index.html', context)
 
 
 def get_employee_info_by_number(request, emp_number):
-    emp = get_object_or_404(Employee, number=emp_number)
+    emp = get_object_or_404(Employee, number=emp_number, active=True)
     # TODO: use JsonResponse object
     return HttpResponse(serializers.serialize('json', [emp]))
 
@@ -73,7 +74,7 @@ def punch_out(request, shift_id, when=None):
 
 
 def punch_in(request, emp_id, foe_id, when=None, punch_in_forgotten=False):
-    emp = get_object_or_404(Employee, pk=emp_id)
+    emp = get_object_or_404(Employee, pk=emp_id, active=True)
     if emp.current_shift is not None:
         return HttpResponse("Open shift exists", status=409) # status CONFLICT
     foe = get_object_or_404(FieldOfEmployment, pk=foe_id)
